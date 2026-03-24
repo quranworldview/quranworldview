@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Qur'an World View — A transformational journey through the Qur'an. We are not making scholars. We are making thinkers." />
+  <meta name="theme-color" content="#0A0C10" />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="Qur'an World View" />
+  <meta property="og:description" content="We are not making scholars. We are making thinkers." />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://quranworldview.pages.dev" />
+  <meta property="og:image"       content="/icons/og-image.png" />
+
+  <title>Qur'an World View</title>
+
+  <!-- Favicon -->
+  <link rel="icon"             href="/icons/favicon.ico" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <link rel="manifest"         href="/manifest.json" />
+
+  <!-- Design system — must load before any component renders -->
+  <link rel="stylesheet" href="/css/design.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+
+  <!--
+    THEME FLASH PREVENTION
+    Reads localStorage before first paint and sets data-theme immediately.
+    Must be inline — cannot be deferred.
+  -->
+  <script>
+    (function () {
+      var stored = localStorage.getItem('qwv_theme') || 'system';
+      var resolved = stored;
+      if (stored === 'system') {
+        resolved = window.matchMedia('(prefers-color-scheme: light)').matches
+          ? 'light' : 'dark';
+      }
+      document.documentElement.setAttribute('data-theme', resolved);
+    })();
+  </script>
+
+  <!-- Firebase v8 compat SDK — loaded before app.js -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+</head>
+
+<body>
+
+  <!-- ── Page Loader ─────────────────────────────────────── -->
+  <!-- Visible immediately on load, faded out after boot -->
+  <div id="page-loader" role="status" aria-label="Loading">
+    <img src="/icons/logo.png" alt="" class="loader-logo" aria-hidden="true" />
+    <div class="loader-spinner" aria-hidden="true"></div>
+  </div>
+
+  <!-- ── Navbar ──────────────────────────────────────────── -->
+  <!-- Rendered by js/components/navbar.js via app.js -->
+  <header id="navbar" role="banner"></header>
+
+  <!-- ── Main Content ────────────────────────────────────── -->
+  <!-- Each page module renders into this container -->
+  <main id="app" role="main"></main>
+
+  <!-- ── Footer ──────────────────────────────────────────── -->
+  <!-- Rendered by js/components/footer.js via app.js -->
+  <footer id="footer"></footer>
+
+  <!-- ── App Boot ────────────────────────────────────────── -->
+  <!-- ES module — loads after Firebase SDKs above -->
+  <script type="module" src="/js/app.js"></script>
+
+</body>
+</html>
