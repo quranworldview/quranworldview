@@ -39,7 +39,7 @@ function _buildFooter() {
         <!-- Brand column -->
         <div class="footer-brand">
           <a href="${BASE}/" class="footer-logo-link" aria-label="Qur'an World View">
-            <img src="/icons/logo.png" alt="" class="footer-logo-img" width="48" height="48" aria-hidden="true" />
+            <img src="${BASE}/icons/logo.png" alt="" class="footer-logo-img" width="48" height="48" aria-hidden="true" />
             <span class="footer-logo-wordmark">Qur'an World View</span>
           </a>
           <p class="footer-tagline">${t('tagline')}</p>

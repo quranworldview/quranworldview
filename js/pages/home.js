@@ -319,7 +319,7 @@ function renderJourney(el) {
       </div>
       <p class="journey-gate-rule reveal">"${t('gate_rule')}"</p>
       <div class="reveal" style="text-align:center; margin-top:var(--space-8);">
-        <a href="/journey" class="btn btn-outline btn-lg">${t('explore_journey')}</a>
+        <a href="${BASE}/journey" class="btn btn-outline btn-lg">${t('explore_journey')}</a>
       </div>
     </div>
   `;
@@ -396,7 +396,7 @@ function renderBlog(el, posts) {
                       <span>${post.author || ''}</span>
                       ${date ? `<span>·</span><span>${date}</span>` : ''}
                     </div>
-                    <a href="/blog/${post.id}" class="blog-card-read-more">
+                    <a href="${BASE}/blog/${post.id}" class="blog-card-read-more">
                       ${t('read_more')}
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                     </a>
@@ -405,7 +405,7 @@ function renderBlog(el, posts) {
             }).join('')}
           </div>
           <div class="reveal" style="text-align:center; margin-top:var(--space-10);">
-            <a href="/blog" class="btn btn-outline">${t('view_all')}</a>
+            <a href="${BASE}/blog" class="btn btn-outline">${t('view_all')}</a>
           </div>`
       }
     </div>
@@ -484,7 +484,7 @@ function renderAbout(el) {
       </div>
 
       <div class="reveal" style="text-align:center; margin-top:var(--space-10);">
-        <a href="/about" class="btn btn-outline btn-lg">${t('about_full_story')}</a>
+        <a href="${BASE}/about" class="btn btn-outline btn-lg">${t('about_full_story')}</a>
       </div>
     </div>
   `;

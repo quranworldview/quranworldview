@@ -55,7 +55,7 @@ function _buildNavbar() {
 
         <!-- Logo -->
         <a href="${BASE}/" class="navbar-logo" aria-label="Qur'an World View — Home">
-          <img src="/icons/logo.png" alt="" class="navbar-logo-img" width="36" height="36" aria-hidden="true" />
+          <img src="${BASE}/icons/logo.png" alt="" class="navbar-logo-img" width="36" height="36" aria-hidden="true" />
           <span class="navbar-logo-text">Qur'an World View</span>
         </a>
 
