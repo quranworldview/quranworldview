@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Qur'an World View — A transformational journey through the Qur'an. We are not making scholars. We are making thinkers." />
+  <meta name="theme-color" content="#0A0C10" />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="Qur'an World View" />
+  <meta property="og:description" content="We are not making scholars. We are making thinkers." />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://quranworldview.github.io/quranworldview/" />
+
+  <title>Qur'an World View</title>
+
+  <!--
+    STEP 1 — Theme flash prevention (runs before first paint, no layout impact)
+  -->
+  <script>
+    (function () {
+      var s = localStorage.getItem('qwv_theme') || 'system';
+      var t = s === 'system'
+        ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+        : s;
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+
+  <!--
+    STEP 2 — Base path detection.
+    This MUST run before any resource link so the browser resolves
+    relative paths (css/, js/, icons/) correctly.
+
+    Strategy: derive base from document.currentScript is unreliable
+    in inline scripts. Instead we use document.URL parsing.
+
+    localhost:8000          → pathname = '/'           → base = '/'
+    github.io/quranworldview/ → pathname starts with '/quranworldview'
+                              → base = '/quranworldview/'
+
+    We write a <base> element synchronously here, before CSS links below.
+  -->
+  <script>
+    (function () {
+      var p = window.location.pathname;
+      // Remove trailing index.html if navigated directly
+      p = p.replace(/\/index\.html$/, '');
+      // Ensure trailing slash
+      if (!p.endsWith('/')) p = p + '/';
+      // Set QWV_BASE without trailing slash for JS path concatenation
+      window.QWV_BASE = p === '/' ? '' : p.slice(0, -1);
+      // Restore GitHub Pages SPA route encoded by 404.html
+      var route = new URLSearchParams(window.location.search).get('route');
+      if (route) {
+        window.history.replaceState(null, '', window.QWV_BASE + route);
+      }
+      // Write <base> synchronously — browser will use it for all subsequent
+      // relative resource requests (CSS, JS, icons)
+      document.write('<base href="' + p + '">');
+    })();
+  </script>
+
+  <!-- Favicon — relative, resolved by <base> written above -->
+  <link rel="icon"             href="icons/favicon.ico" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="manifest"         href="manifest.json" />
+
+  <!-- Design system — relative, resolved by <base> -->
+  <link rel="stylesheet" href="css/design.css" />
+  <link rel="stylesheet" href="css/components.css" />
+
+  <!-- Firebase v8 compat SDK — absolute CDN, unaffected by base -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+</head>
+
+<body>
+
+  <!-- Page Loader -->
+  <div id="page-loader" role="status" aria-label="Loading">
+    <img src="icons/logo.png" alt="" class="loader-logo" aria-hidden="true" />
+    <div class="loader-spinner" aria-hidden="true"></div>
+  </div>
+
+  <!-- Navbar -->
+  <header id="navbar" role="banner"></header>
+
+  <!-- Main content -->
+  <main id="app" role="main"></main>
+
+  <!-- Footer -->
+  <footer id="footer"></footer>
+
+  <!-- App boot — relative path, resolved by <base> -->
+  <script type="module" src="js/app.js"></script>
+
+</body>
+</html>

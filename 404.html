@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Qur'an World View</title>
+  <script>
+    // GitHub Pages SPA redirect trick.
+    // Encode the path into a query param, then index.html decodes it.
+    var base  = window.location.pathname.split('/').slice(0, 2).join('/');
+    var path  = window.location.pathname.slice(base.length) || '/';
+    var query = '?route=' + encodeURIComponent(path + window.location.search);
+    window.location.replace(base + '/' + query + window.location.hash);
+  </script>
+</head>
+<body></body>
+</html>

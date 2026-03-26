@@ -1,0 +1,37 @@
+{
+  "testimonials": [
+    {
+      "id": 1,
+      "name": "Anonymous",
+      "stage": "Iqra",
+      "quote": {
+        "en": "For the first time in my life, I'm not just finishing the Qur'an — I'm sitting with it.",
+        "hi": "पहली बार मैं क़ुरआन ख़त्म नहीं कर रहा — उसके साथ बैठ रहा हूँ।",
+        "ur": "پہلی بار میں قرآن ختم نہیں کر رہا — اس کے ساتھ بیٹھ رہا ہوں۔"
+      },
+      "joined_at": "2026-03-01"
+    },
+    {
+      "id": 2,
+      "name": "Zainab A.",
+      "stage": "Alif",
+      "quote": {
+        "en": "I always thought Arabic was impossible for me. Alif proved me completely wrong.",
+        "hi": "मुझे लगता था अरबी मेरे बस की नहीं। अलिफ़ ने साबित किया कि मैं ग़लत थी।",
+        "ur": "مجھے لگتا تھا عربی میرے بس کی نہیں۔ الف نے ثابت کیا کہ میں غلط تھی۔"
+      },
+      "joined_at": "2026-03-05"
+    },
+    {
+      "id": 3,
+      "name": "Tariq M.",
+      "stage": "Miftah",
+      "quote": {
+        "en": "The 5 Lenses changed how I read every single ayah. I can't go back.",
+        "hi": "5 लेंसेज़ ने मेरे क़ुरआन पढ़ने का तरीक़ा बदल दिया। अब वापस नहीं जा सकता।",
+        "ur": "5 لینسز نے میرے قرآن پڑھنے کا طریقہ بدل دیا۔ اب واپس نہیں جا سکتا۔"
+      },
+      "joined_at": "2026-01-15"
+    }
+  ]
+}

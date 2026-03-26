@@ -1,0 +1,39 @@
+{
+  "prompts": [
+    {
+      "en": "What did the Qur'an say to you today?",
+      "hi": "आज क़ुरआन ने आपसे क्या कहा?",
+      "ur": "آج قرآن نے آپ سے کیا کہا؟"
+    },
+    {
+      "en": "Which ayah have you been carrying with you this week?",
+      "hi": "इस हफ़्ते कौन सी आयत आपके साथ रही?",
+      "ur": "اس ہفتے کون سی آیت آپ کے ساتھ رہی؟"
+    },
+    {
+      "en": "What did you notice that you had never noticed before?",
+      "hi": "आपने क्या देखा जो पहले कभी नहीं देखा था?",
+      "ur": "آپ نے کیا دیکھا جو پہلے کبھی نہیں دیکھا تھا؟"
+    },
+    {
+      "en": "How did today's reading connect to your life?",
+      "hi": "आज की तिलावत आपकी ज़िंदगी से कैसे जुड़ी?",
+      "ur": "آج کی تلاوت آپ کی زندگی سے کیسے جڑی؟"
+    },
+    {
+      "en": "What question did the Qur'an leave you with?",
+      "hi": "क़ुरआन ने आपके मन में कौन सा सवाल छोड़ा?",
+      "ur": "قرآن نے آپ کے ذہن میں کون سا سوال چھوڑا؟"
+    },
+    {
+      "en": "What would you share from today's session with a friend?",
+      "hi": "आज के सेशन से आप किसी दोस्त को क्या बताते?",
+      "ur": "آج کے سیشن سے آپ کسی دوست کو کیا بتاتے؟"
+    },
+    {
+      "en": "Which word kept returning to you?",
+      "hi": "कौन सा लफ़्ज़ बार-बार आपके पास आता रहा?",
+      "ur": "کون سا لفظ بار بار آپ کے پاس آتا رہا؟"
+    }
+  ]
+}
