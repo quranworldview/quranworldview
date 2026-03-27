@@ -53,8 +53,8 @@ const ROUTES = {
   '/about':        () => import('./pages/about.js'),
   '/contact':      () => import('./pages/contact.js'),
   '/login':        () => import('./pages/login.js'),
-  '/dashboard':    () => authGuard(() => import('./pages/dashboard.js')),
-  '/admin':        () => adminGuard(() => import('./pages/admin.js')),
+  '/dashboard':    async () => authGuard(() => import('./pages/dashboard.js')),
+  '/admin':        async () => adminGuard(() => import('./pages/admin.js')),
 };
 
 const PREFIX_ROUTES = [
@@ -82,7 +82,9 @@ async function navigate(pathname, { pushState = false } = {}) {
   }
 
   try {
-    const mod = await loader();
+    // loader() may return a Promise<module> or Promise<Promise<module>>
+    // (when authGuard/adminGuard are async). Double-await resolves both.
+    const mod = await Promise.resolve(await loader());
 
     _toggleChrome(route);
 

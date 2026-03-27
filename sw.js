@@ -8,7 +8,6 @@ const CACHE_NAME    = `${CACHE_VERSION}-${new Date().toISOString().split('T')[0]
 
 // Files to cache immediately on install (the app shell)
 const SHELL_FILES = [
-  '/',
   '/index.html',
   '/css/design.css',
   '/css/components.css',
@@ -20,10 +19,6 @@ const SHELL_FILES = [
   '/js/core/theme.js',
   '/js/components/navbar.js',
   '/js/components/footer.js',
-  '/js/data/slides.json',
-  '/js/data/ayah-of-the-day.json',
-  '/js/data/testimonials.json',
-  '/js/data/reflection-prompts.json',
   '/manifest.json',
 ];
 
@@ -31,7 +26,10 @@ const SHELL_FILES = [
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL_FILES))
+    caches.open(CACHE_NAME).then(cache =>
+      // Use individual add() calls so one failure doesn't abort all caching
+      Promise.allSettled(SHELL_FILES.map(url => cache.add(url)))
+    )
   );
 });
 

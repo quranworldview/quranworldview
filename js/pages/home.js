@@ -27,7 +27,7 @@ export default async function render(container) {
 
   const [slides, ayah, testimonials, blogPosts] = await Promise.all([
     fetchJSON(BASE + '/js/data/slides.json').then(d => d?.slides || []),
-    fetchJSON(BASE + '/js/data/ayah-of-the-day.json'),
+    fetchAyahOfDay(),
     fetchJSON(BASE + '/js/data/testimonials.json').then(d => d?.testimonials || []),
     fetchBlogPosts(),
   ]);
@@ -518,6 +518,15 @@ async function fetchJSON(url) {
     console.warn('[QWV home] fetchJSON failed:', url, e);
     return null;
   }
+}
+
+async function fetchAyahOfDay() {
+  // Try Firestore first (admin-updated), fall back to static JSON
+  try {
+    const doc = await db.collection('config').doc('ayah_of_day').get();
+    if (doc.exists) return doc.data();
+  } catch {}
+  return fetchJSON(BASE + '/js/data/ayah-of-the-day.json');
 }
 
 async function fetchBlogPosts() {

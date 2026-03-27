@@ -16,12 +16,13 @@
 // Replace all values below with your actual Firebase project config.
 // Get from: Firebase Console → Project Settings → Your Apps → SDK setup
 const FIREBASE_CONFIG = {
-  apiKey:            "REPLACE_WITH_YOUR_API_KEY",
-  authDomain:        "REPLACE_WITH_YOUR_AUTH_DOMAIN",
-  projectId:         "REPLACE_WITH_YOUR_PROJECT_ID",
-  storageBucket:     "REPLACE_WITH_YOUR_STORAGE_BUCKET",
-  messagingSenderId: "REPLACE_WITH_YOUR_MESSAGING_SENDER_ID",
-  appId:             "REPLACE_WITH_YOUR_APP_ID",
+  apiKey:            "AIzaSyCqxgyulLw6nitLSjn89M1u0A7bxbWlt_U",
+  authDomain:        "quranworldview-home.firebaseapp.com",
+  projectId:         "quranworldview-home",
+  storageBucket:     "quranworldview-home.firebasestorage.app",
+  messagingSenderId: "349899904697",
+  appId:             "1:349899904697:web:b78d66af8f9af2cb80ad68",
+  measurementId:     "G-X21FH00JJ5",
 };
 
 // ── Initialise ───────────────────────────────────────────────

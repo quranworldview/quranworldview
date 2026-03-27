@@ -59,12 +59,45 @@ async function _fetchUserProfile(uid) {
     if (doc.exists) {
       return { uid, ...doc.data() };
     }
-    // Profile not yet created (new user) — return minimal object
-    return { uid, member_tier: 'student', stage: 1 };
+    // First login — auto-create the Firestore document
+    return await _createUserProfile(uid);
   } catch (err) {
     console.error('[QWV auth] Failed to fetch user profile:', err);
     return { uid, member_tier: 'student', stage: 1 };
   }
+}
+
+// ── Auto-create profile on first login ───────────────────────
+async function _createUserProfile(uid) {
+  const firebaseUser = auth.currentUser;
+  const profile = {
+    name:            firebaseUser?.displayName || firebaseUser?.email?.split('@')[0] || 'Student',
+    contact:         firebaseUser?.email || '',
+    language:        'hi',
+    joined_at:       firebase.firestore.FieldValue.serverTimestamp(),
+    stage:           1,
+    stage_unlocked:  { iqra: true, alif: false, aamaal: false, ahad: false, miftah: false },
+    streak:          0,
+    total_gems:      0,
+    last_active:     firebase.firestore.FieldValue.serverTimestamp(),
+    source:          'direct',
+    is_sabiqun:      false,
+    member_tier:     'student',
+    gate_status: {
+      alif:   'locked',
+      aamaal: 'locked',
+      ahad:   'locked',
+      miftah: 'locked',
+    },
+    core_member_applied: false,
+  };
+  try {
+    await db.collection(COLLECTIONS.USERS).doc(uid).set(profile);
+    console.log('[QWV auth] New user profile created:', uid);
+  } catch (err) {
+    console.error('[QWV auth] Failed to create user profile:', err);
+  }
+  return { uid, ...profile };
 }
 
 // ── Public getters ───────────────────────────────────────────
@@ -112,10 +145,10 @@ export async function refreshUserProfile() {
  * Wraps a dynamic page import. Redirects to /login if not authenticated.
  * Usage: authGuard(() => import('./pages/dashboard.js'))
  */
-export function authGuard(loader) {
-  const { user } = getCurrentUser();
+export async function authGuard(loader) {
+  // Always await auth resolution — user may not be cached yet on first load
+  const { user } = await Promise.resolve(getCurrentUser());
   if (!user) {
-    // Store intended destination for post-login redirect
     sessionStorage.setItem('qwv_redirect_after_login', window.location.pathname);
     window.history.replaceState(null, '', BASE + '/login');
     return import('./pages/login.js');
@@ -128,8 +161,9 @@ export function authGuard(loader) {
  * Wraps a dynamic page import. Only allows through for admin users.
  * Redirects to /dashboard if logged in but not admin, or /login if not logged in.
  */
-export function adminGuard(loader) {
-  const { user, profile } = getCurrentUser();
+export async function adminGuard(loader) {
+  // Always await auth resolution — profile may not be cached yet on first load
+  const { user, profile } = await Promise.resolve(getCurrentUser());
   if (!user) {
     sessionStorage.setItem('qwv_redirect_after_login', '/admin');
     window.history.replaceState(null, '', BASE + '/login');
