@@ -53,6 +53,8 @@ const ROUTES = {
   '/about':        () => import('./pages/about.js'),
   '/contact':      () => import('./pages/contact.js'),
   '/login':        () => import('./pages/login.js'),
+  '/welcome':      async () => authGuard(() => import('./pages/welcome.js')),
+  '/apply':        () => import('./pages/apply.js'),
   '/dashboard':    async () => authGuard(() => import('./pages/dashboard.js')),
   '/admin':        async () => adminGuard(() => import('./pages/admin.js')),
 };
@@ -61,7 +63,7 @@ const PREFIX_ROUTES = [
   { prefix: '/blog/', loader: () => import('./pages/blog-post.js') },
 ];
 
-const CHROME_HIDDEN = ['/dashboard', '/admin'];
+const CHROME_HIDDEN = ['/dashboard', '/admin', '/apply', '/welcome'];
 
 // ── Navigation ────────────────────────────────────────────────
 

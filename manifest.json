@@ -1,7 +1,7 @@
 {
-  "name": "Qur'an World View",
+  "name": "Quran World View",
   "short_name": "QWV",
-  "description": "A transformational journey through the Qur'an.",
+  "description": "A transformational journey through the Quran.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

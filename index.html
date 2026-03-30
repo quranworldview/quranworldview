@@ -46,18 +46,32 @@
       var p = window.location.pathname;
       // Remove trailing index.html if navigated directly
       p = p.replace(/\/index\.html$/, '');
-      // Ensure trailing slash
-      if (!p.endsWith('/')) p = p + '/';
-      // Set QWV_BASE without trailing slash for JS path concatenation
-      window.QWV_BASE = p === '/' ? '' : p.slice(0, -1);
+
+      // Detect if we are running under a GitHub Pages subpath.
+      // A subpath looks like /reponame/... where 'reponame' is NOT
+      // a known SPA route. Known SPA routes are single-segment paths
+      // like /apply, /login, /dashboard, /welcome, /admin, /blog etc.
+      // On localhost and Cloudflare Pages the base is always '/'.
+      var knownRoutes = [
+        'apply','login','dashboard','welcome','admin','blog',
+        'journey','apps','library','testimonials','about','contact'
+      ];
+      var segments = p.replace(/^\//, '').split('/');
+      var firstSeg = segments[0];
+      var isGhPages = firstSeg && knownRoutes.indexOf(firstSeg) === -1;
+
+      var base = isGhPages ? '/' + firstSeg + '/' : '/';
+      window.QWV_BASE = isGhPages ? '/' + firstSeg : '';
+
       // Restore GitHub Pages SPA route encoded by 404.html
       var route = new URLSearchParams(window.location.search).get('route');
       if (route) {
         window.history.replaceState(null, '', window.QWV_BASE + route);
       }
+
       // Write <base> synchronously — browser will use it for all subsequent
       // relative resource requests (CSS, JS, icons)
-      document.write('<base href="' + p + '">');
+      document.write('<base href="' + base + '">');
     })();
   </script>
 

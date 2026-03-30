@@ -1,20 +1,16 @@
 /**
  * QUR'AN WORLD VIEW — about.js (stub)
- * To be built in its dedicated step.
+ * To be built in Step 8.
  */
 import { t } from '../core/i18n.js';
+const BASE = window.QWV_BASE || '';
 
 export default function render(container) {
   container.innerHTML = `
-    <div style="
-      min-height: calc(100vh - var(--navbar-height));
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: var(--space-4); text-align: center;
-      padding: var(--space-8);
-    ">
+    <div style="min-height:calc(100vh - var(--navbar-height));display:flex;align-items:center;
+      justify-content:center;flex-direction:column;gap:var(--space-4);text-align:center;padding:var(--space-8);">
       <span class="section-label">about</span>
       <h1 style="font-family:var(--font-display);color:var(--off-white);">Coming soon</h1>
       <p style="color:var(--text-muted);">This page is being built.</p>
-    </div>
-  `;
+    </div>`;
 }

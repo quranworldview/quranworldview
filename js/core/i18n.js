@@ -185,6 +185,18 @@ const STRINGS = {
     login_reset_sent:   'Check your email for a reset link.',
     login_back_to_login:'Back to sign in',
 
+    // Sign up
+    signup_title:        'Create your account.',
+    signup_subtitle:     'Begin your journey with Qur\'an World View.',
+    signup_name:         'Your name',
+    signup_name_placeholder: 'e.g. Yusuf Khan',
+    signup_email:        'Email address',
+    signup_password:     'Create a password',
+    signup_cta:          'Create Account',
+    signup_have_account: 'Already have an account? Sign in',
+    auth_error_email_in_use: 'An account with this email already exists.',
+    auth_error_weak_password: 'Password must be at least 6 characters.',
+
     // Auth errors
     auth_error_not_found:     'No account found with this email.',
     auth_error_wrong_password:'Incorrect password.',
@@ -346,6 +358,18 @@ const STRINGS = {
     login_reset_sent:   'आपकी ईमेल पर लिंक भेज दिया गया है।',
     login_back_to_login:'लॉग इन पर वापस जाएं',
 
+    // Sign up
+    signup_title:        'अकाउंट बनाएं।',
+    signup_subtitle:     'क़ुरआन वर्ल्ड व्यू के साथ अपना सफ़र शुरू करें।',
+    signup_name:         'आपका नाम',
+    signup_name_placeholder: 'जैसे: यूसुफ़ ख़ान',
+    signup_email:        'ईमेल',
+    signup_password:     'पासवर्ड बनाएं',
+    signup_cta:          'अकाउंट बनाएं',
+    signup_have_account: 'पहले से अकाउंट है? लॉग इन करें',
+    auth_error_email_in_use: 'इस ईमेल से पहले से अकाउंट है।',
+    auth_error_weak_password: 'पासवर्ड कम से कम 6 अक्षर का होना चाहिए।',
+
     // Auth errors
     auth_error_not_found:     'इस ईमेल से कोई अकाउंट नहीं मिला।',
     auth_error_wrong_password:'पासवर्ड ग़लत है।',
@@ -506,6 +530,18 @@ const STRINGS = {
     login_reset_cta:    'ری سیٹ لنک بھیجیں',
     login_reset_sent:   'آپ کی ای میل پر لنک بھیج دیا گیا ہے۔',
     login_back_to_login:'لاگ اِن پر واپس جائیں',
+
+    // Sign up
+    signup_title:        'اکاؤنٹ بنائیں۔',
+    signup_subtitle:     'قرآن ورلڈ ویو کے ساتھ اپنا سفر شروع کریں۔',
+    signup_name:         'آپ کا نام',
+    signup_name_placeholder: 'مثلاً: یوسف خان',
+    signup_email:        'ای میل',
+    signup_password:     'پاس ورڈ بنائیں',
+    signup_cta:          'اکاؤنٹ بنائیں',
+    signup_have_account: 'پہلے سے اکاؤنٹ ہے؟ لاگ اِن کریں',
+    auth_error_email_in_use: 'اس ای میل سے پہلے سے اکاؤنٹ موجود ہے۔',
+    auth_error_weak_password: 'پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے۔',
 
     // Auth errors
     auth_error_not_found:     'اس ای میل سے کوئی اکاؤنٹ نہیں ملا۔',

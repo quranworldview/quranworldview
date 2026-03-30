@@ -29,7 +29,8 @@ import { getCurrentUser, logout }   from '../core/auth.js';
 import { db, COLLECTIONS }         from '../core/firebase.js';
 import { t, getLang }              from '../core/i18n.js';
 
-const BASE = window.QWV_BASE || '';
+const BASE       = window.QWV_BASE || '';
+const WORKER_URL = 'https://qwv-worker.YOUR-SUBDOMAIN.workers.dev'; // ← update after wrangler deploy
 
 // ── Active module state ───────────────────────────────────────
 let _activeModule = 'overview';
@@ -118,6 +119,7 @@ function buildAdminShell() {
 function _buildNavItems() {
   const items = [
     { id: 'overview',    label: 'Overview',         icon: '◈', badge: null },
+    { id: 'applications', label: 'Applications',      icon: '✦', badge: 'applications' },
     { id: 'blog',        label: 'Blog',              icon: '✍', badge: null },
     { id: 'ayah',        label: 'Ayah of the Day',  icon: '☽', badge: null },
     { id: 'students',    label: 'Students',          icon: '◎', badge: null },
@@ -215,6 +217,10 @@ async function loadBadges(container) {
 
     _setBadge(container, 'gates', gateCount);
     _setBadge(container, 'reflections', refSnap.size);
+
+    // Applications pending count
+    const appSnap = await db.collection('applications').where('status','==','pending').get();
+    _setBadge(container, 'applications', appSnap.size);
   } catch (e) {
     console.warn('[QWV admin] Badge load failed:', e);
   }
@@ -251,6 +257,7 @@ async function loadModule(container, moduleId, profile) {
 
   switch (moduleId) {
     case 'overview':    await renderOverview(main, profile);    break;
+    case 'applications': await renderApplications(main, profile);  break;
     case 'blog':        await renderBlog(main, profile);        break;
     case 'ayah':        await renderAyah(main, profile);        break;
     case 'students':    await renderStudents(main, profile);    break;
@@ -1583,6 +1590,204 @@ async function loadInsightsList(el, profile) {
   }
 }
 
+
+// ═══════════════════════════════════════════════════════════════
+// MODULE 0 — APPLICATIONS (Student Application Review)
+// ═══════════════════════════════════════════════════════════════
+
+async function renderApplications(el, profile) {
+  el.innerHTML = `<div class="admin-module">
+    <div class="admin-module-header">
+      <h1 class="admin-module-title">Applications</h1>
+    </div>
+    <div class="admin-tab-bar">
+      <button class="admin-tab active" data-app-tab="pending">Pending</button>
+      <button class="admin-tab" data-app-tab="approved">Approved</button>
+      <button class="admin-tab" data-app-tab="rejected">Rejected</button>
+    </div>
+    <div id="applications-list">
+      <div class="admin-loading"><div class="spinner"></div></div>
+    </div>
+  </div>`;
+
+  el.querySelectorAll('[data-app-tab]').forEach(tab => {
+    tab.addEventListener('click', () => {
+      el.querySelectorAll('[data-app-tab]').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      loadApplicationsList(el, tab.dataset.appTab, profile);
+    });
+  });
+
+  loadApplicationsList(el, 'pending', profile);
+}
+
+async function loadApplicationsList(el, status, profile) {
+  const listEl = el.querySelector('#applications-list');
+  listEl.innerHTML = `<div class="admin-loading"><div class="spinner"></div></div>`;
+
+  try {
+    let query = db.collection('applications').limit(100);
+    if (status !== 'all') query = query.where('status', '==', status);
+    const snap = await query.get();
+
+    // Sort client-side
+    const docs = snap.docs.sort((a,b) => {
+      return (b.data().submitted_at?.toMillis()||0) - (a.data().submitted_at?.toMillis()||0);
+    });
+
+    if (!docs.length) {
+      listEl.innerHTML = `<div class="admin-empty">No ${status} applications.</div>`;
+      return;
+    }
+
+    listEl.innerHTML = `<div class="admin-queue">
+      ${docs.map(doc => {
+        const app  = doc.data();
+        const date = app.submitted_at?.toDate?.()?.toLocaleDateString() || '—';
+        return `
+          <div class="admin-queue-card" id="app-card-${doc.id}">
+            <div class="admin-queue-header">
+              <div>
+                <p class="admin-queue-name">${app.name||'—'}</p>
+                <p class="admin-queue-meta">${app.email||'—'} · ${date} · ${app.language||'en'}</p>
+              </div>
+              <span class="badge ${app.status==='pending'?'badge-muted':app.status==='approved'?'badge-success':'badge-crimson'}">
+                ${app.status}
+              </span>
+            </div>
+
+            <!-- MCQ Answers -->
+            <div class="admin-response-answers" style="margin:var(--space-4) 0;">
+              ${Object.entries(app.answers||{}).map(([q,a]) => `
+                <div class="admin-response-item">
+                  <p class="admin-response-q">${q}</p>
+                  <p class="admin-response-a">${a}</p>
+                </div>`).join('')}
+            </div>
+
+            <!-- Reflection -->
+            ${app.reflection ? `
+              <div class="admin-response-item" style="margin-top:var(--space-3);border-left-color:var(--gold);">
+                <p class="admin-response-q">Reflection</p>
+                <p class="admin-response-a" style="font-style:italic;">"${app.reflection}"</p>
+              </div>` : ''}
+
+            ${app.status === 'pending' ? `
+              <div class="admin-queue-actions" style="margin-top:var(--space-5);">
+                <button class="btn btn-primary btn-sm" data-approve-app="${doc.id}"
+                  data-name="${app.name||''}" data-email="${app.email||''}" data-lang="${app.language||'hi'}">
+                  ✓ Approve & Create Account
+                </button>
+                <button class="btn btn-ghost btn-sm" style="color:var(--error);" data-reject-app="${doc.id}">
+                  Reject
+                </button>
+              </div>
+              <div class="admin-credentials-box hidden" id="creds-${doc.id}"></div>
+              <p class="admin-queue-status" id="app-status-${doc.id}"></p>
+            ` : app.status === 'approved' ? `
+              <p style="color:var(--success);font-size:var(--text-sm);margin-top:var(--space-4);">
+                ✓ Account created
+              </p>` : ''}
+          </div>`;
+      }).join('')}
+    </div>`;
+
+    // Wire approve buttons
+    listEl.querySelectorAll('[data-approve-app]').forEach(btn => {
+      btn.addEventListener('click', () => approveApplication(
+        listEl, btn.dataset.approveApp,
+        btn.dataset.name, btn.dataset.email, btn.dataset.lang,
+        profile
+      ));
+    });
+
+    // Wire reject buttons
+    listEl.querySelectorAll('[data-reject-app]').forEach(btn => {
+      btn.addEventListener('click', () => rejectApplication(listEl, btn.dataset.rejectApp, profile));
+    });
+
+  } catch (e) {
+    listEl.innerHTML = `<div class="admin-error">Failed to load: ${e.message}</div>`;
+  }
+}
+
+async function approveApplication(el, appId, name, email, lang, adminProfile) {
+  const statusEl = el.querySelector(`#app-status-${appId}`);
+  const credsEl  = el.querySelector(`#creds-${appId}`);
+  const btn      = el.querySelector(`[data-approve-app="${appId}"]`);
+
+  if (statusEl) statusEl.textContent = 'Creating account…';
+  if (btn)      { btn.disabled = true; btn.innerHTML = '<span class="btn-spinner"></span>'; }
+
+  try {
+    // Call the Cloudflare Worker (replaces Firebase Functions — free, no Blaze required)
+    const idToken = await firebase.auth().currentUser.getIdToken();
+    const res     = await fetch(WORKER_URL + '/create-account', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ idToken, name, email, applicationId: appId, language: lang }),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      // Show credentials to admin
+      if (credsEl) {
+        credsEl.classList.remove('hidden');
+        credsEl.innerHTML = `
+          <div class="admin-creds-card">
+            <p class="admin-creds-title">✓ Account created — share these credentials privately</p>
+            <div class="admin-creds-row">
+              <span class="admin-creds-label">Name</span>
+              <span class="admin-creds-value">${data.name}</span>
+            </div>
+            <div class="admin-creds-row">
+              <span class="admin-creds-label">Email</span>
+              <span class="admin-creds-value">${data.email}</span>
+            </div>
+            <div class="admin-creds-row">
+              <span class="admin-creds-label">Password</span>
+              <span class="admin-creds-value admin-creds-password">${data.password}</span>
+            </div>
+            <p class="admin-creds-note">
+              Share via WhatsApp or email personally. Student can change their password after first login.
+            </p>
+            <button class="btn btn-outline btn-sm" id="copy-creds-${appId}">Copy credentials</button>
+          </div>`;
+
+        el.querySelector(`#copy-creds-${appId}`)?.addEventListener('click', () => {
+          const text = 'QWV Login Credentials' + '\n' + 'Email: ' + data.email + '\n' + 'Password: ' + data.password + '\n' + 'Login at: https://quranworldview.github.io/quranworldview/';
+          navigator.clipboard.writeText(text).then(() => {
+            el.querySelector(`#copy-creds-${appId}`).textContent = 'Copied!';
+          });
+        });
+      }
+
+      if (statusEl) statusEl.textContent = '';
+    } else {
+      throw new Error(data.error || 'Unknown error');
+    }
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = '✓ Approve & Create Account'; }
+    if (statusEl) statusEl.textContent = 'Failed: ' + (err.message || err.toString());
+  }
+}
+
+async function rejectApplication(el, appId, adminProfile) {
+  if (!confirm('Reject this application?')) return;
+  const statusEl = el.querySelector(`#app-status-${appId}`);
+  try {
+    await db.collection('applications').doc(appId).update({
+      status:      'rejected',
+      reviewed_by: adminProfile?.uid || '',
+      reviewed_at: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    if (statusEl) statusEl.textContent = 'Application rejected.';
+    const card = el.querySelector(`#app-card-${appId}`);
+    if (card) card.style.opacity = '0.5';
+  } catch (e) {
+    if (statusEl) statusEl.textContent = 'Failed: ' + e.message;
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════
 // HELPERS

@@ -199,9 +199,12 @@ function wireLoginPage(container) {
     const result = await loginWithEmail(email, password);
 
     if (result.success) {
-      // Redirect to intended destination or dashboard
-      const dest = sessionStorage.getItem('qwv_redirect_after_login') || '/dashboard';
       sessionStorage.removeItem('qwv_redirect_after_login');
+      // first_login: true → Welcome screen (orientation)
+      // first_login: false → Dashboard (or intended destination)
+      const dest = result.firstLogin
+        ? '/welcome'
+        : (sessionStorage.getItem('qwv_redirect_after_login') || '/dashboard');
       window.history.replaceState(null, '', BASE + dest);
       window.dispatchEvent(new CustomEvent('qwv:navigate', { detail: { path: dest } }));
     } else {

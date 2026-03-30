@@ -42,6 +42,10 @@ export function initAuth() {
 
       _authReady = true;
 
+      // If this is a fresh login (not a page reload), check first_login
+      // Navigation is handled by login.js after loginWithEmail() resolves.
+      // On page reload, app.js routing handles the redirect via authGuard.
+
       // Resolve the boot promise on first call
       resolve({ user: _currentUser, profile: _userProfile });
 
@@ -60,7 +64,7 @@ async function _fetchUserProfile(uid) {
       return { uid, ...doc.data() };
     }
     // First login — auto-create the Firestore document
-    return await _createUserProfile(uid);
+    return await _createUserProfile(uid);  // name comes from displayName or email
   } catch (err) {
     console.error('[QWV auth] Failed to fetch user profile:', err);
     return { uid, member_tier: 'student', stage: 1 };
@@ -68,10 +72,10 @@ async function _fetchUserProfile(uid) {
 }
 
 // ── Auto-create profile on first login ───────────────────────
-async function _createUserProfile(uid) {
+async function _createUserProfile(uid, overrideName = null) {
   const firebaseUser = auth.currentUser;
   const profile = {
-    name:            firebaseUser?.displayName || firebaseUser?.email?.split('@')[0] || 'Student',
+    name:            overrideName || firebaseUser?.displayName || firebaseUser?.email?.split('@')[0] || 'Student',
     contact:         firebaseUser?.email || '',
     language:        'hi',
     joined_at:       firebase.firestore.FieldValue.serverTimestamp(),
@@ -185,6 +189,29 @@ export async function adminGuard(loader) {
 export async function loginWithEmail(email, password) {
   try {
     await auth.signInWithEmailAndPassword(email, password);
+    // After sign-in, auth state listener fires and populates _userProfile.
+    // Return first_login flag so login.js can route correctly.
+    // We wait a tick for the auth state listener to settle.
+    await new Promise(r => setTimeout(r, 300));
+    const firstLogin = _userProfile?.first_login === true;
+    return { success: true, firstLogin };
+  } catch (err) {
+    return { success: false, error: _friendlyAuthError(err.code) };
+  }
+}
+
+/**
+ * registerWithEmail(email, password, name)
+ * Creates a new Firebase Auth account. Profile is auto-created by _createUserProfile.
+ * Returns { success: true } or { success: false, error: string }
+ */
+export async function registerWithEmail(email, password, name) {
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, password);
+    // Update display name so _createUserProfile picks it up
+    await cred.user.updateProfile({ displayName: name });
+    // Manually trigger profile creation with correct name
+    _userProfile = await _createUserProfile(cred.user.uid, name);
     return { success: true };
   } catch (err) {
     return { success: false, error: _friendlyAuthError(err.code) };
